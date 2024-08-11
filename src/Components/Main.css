@@ -3,7 +3,7 @@
     justify-content: center;
 }
 .app-container{
-    padding-top: 15%;
+    padding-top: 12%;
     width: 88%;
     display: flex;
     flex-direction: column;
@@ -67,7 +67,7 @@ p{
 .forcast-conatiner{
     position: fixed;
     bottom: 0;
-    height: 40vh;
+    height: 42vh;
     width: 100vw;
     border-radius: 25px 25px 0px 0px;
     background: linear-gradient(
@@ -95,4 +95,29 @@ p{
 }
 .divider{
     box-shadow: 0 4px 5px rgba(255, 255, 255, 1);
+}
+.div-open{
+    position: absolute;
+    margin-top: 3%;
+    height: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+.open-btn{
+    background-color: white;
+    height: 2.5px;
+    width: 15%;
+}
+.minimalise-description{
+    color: #9e99af;
+    font-size: 95%;
+}
+.temp{
+    font-weight: 500;
+}
+.minimalise-heading{
+    font-size: 110%;
+    margin-bottom: 20%;
 }

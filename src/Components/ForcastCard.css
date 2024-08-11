@@ -1,3 +1,26 @@
 .card-conatiner{
-
+    background-color: #172542;
+    height: 24vh;
+    width: 10vh;
+    border-radius: 30px;
+    cursor: pointer;
+    border: solid 0.1px rgb(45, 60, 119);
+    color: white;
+}
+.card-conatiner:hover{
+    background-color: #202b83;
+    border: solid 0.1px rgb(59, 78, 154);
+}
+.preview-time,.preview-temp{
+    font-size: 85%;
+}
+.preview-rain{
+    font-size: 75%;
+    color: #9e99af;
+}
+.weather-preview2{
+    margin: 10% 0%;
+    background-color: red;
+    height: 40%;
+    width: 100%;
 }
