@@ -6,6 +6,35 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import ForcastCard from './ForcastCard';
 
 export default function Main() {
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
+  const [error, setError] = useState(null);
+  const [watchId, setWatchId] = useState(null);
+ 
+  useEffect(() => {
+    if (navigator.geolocation) {
+      const id = navigator.geolocation.watchPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          setError(null);
+        },
+        (error) => {
+          setError(error.message);
+        }
+      );
+      setWatchId(id);
+    }
+    return () => {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, [watchId]);
+
+  //location.latitude
+  //location.longitude
 
   const [uvIndex, setUvIndex] = useState(1.2);
   const [fillColor, setFillColor] = useState('');
