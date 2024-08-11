@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import Form from 'react-bootstrap/Form';
 import 'swiper/css';
 import './Main.css'
 import ProgressBar from 'react-bootstrap/ProgressBar';
@@ -39,6 +40,18 @@ export default function Main() {
   const [uvIndex, setUvIndex] = useState(1.2);
   const [fillColor, setFillColor] = useState('');
   const[uvStatus,setUvStatus]=useState('');
+  const [showSearchBox, setShowSearchBox] = useState(false);
+  const [showSetLocation, setShowSetLocation] = useState(true);
+
+  const searchLocation=()=>{
+    setShowSearchBox(false);
+    setShowSetLocation(true);
+  }
+
+  const toggleSearchBox = () => {
+    setShowSearchBox(!showSearchBox);
+    setShowSetLocation(false); 
+  };
 
   useEffect(() => {
     if (uvIndex <= 2) {
@@ -75,6 +88,7 @@ export default function Main() {
     });
     setOpenOverlayBtn(false);
     setCloseOverlayBtn(true);
+    setShowSearchBox(false);
   };
 
   const closeOverlay=()=>{
@@ -85,6 +99,7 @@ export default function Main() {
     });
     setCloseOverlayBtn(false);
     setOpenOverlayBtn(true);
+    setShowSetLocation(true);
   }
 
   return (
@@ -111,6 +126,14 @@ export default function Main() {
                 <p className='min-info-icon-name'>Rain</p>
               </div>
               <p className='min-info-value text-light'>20%</p>
+              {showSearchBox && <div className="searchBox">
+                  <Form.Control className="searchBoxInput" type="text" placeholder="Search by city" />
+                  <div className="search-btn" onClick={searchLocation}><img className='target' src="./Assets/Images/target.png"/>&nbsp;&nbsp;Set location</div>
+                </div>}
+              {showSetLocation &&
+              <div className="getLocation ms-3" onClick={toggleSearchBox}>
+                  <img className='arrow' src="./Assets/Images/search.png"/>
+              </div>}
             </div>
             <div className="weather-preview">
             </div>
