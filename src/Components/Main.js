@@ -132,6 +132,7 @@ export default function Main() {
             <img className="min-info-icons2" src="./Assets/Images/rain.png" />
             <p className="min-info-icon-name">Rain</p>
           </div>
+          <p className="min-info-value text-light ms-1">59%</p>
           {showSearchBox && (
             <div className="searchBox">
               <Form.Control className="searchBoxInput" type="text" placeholder="Search by city" />
