@@ -9,7 +9,6 @@ export default function Main() {
   const [location, setLocation] = useState({ latitude: null, longitude: null });
   const [error, setError] = useState(null);
   const [watchId, setWatchId] = useState(null);
-  const [uvIndex, setUvIndex] = useState(1.2);
   const [fillColor, setFillColor] = useState('');
   const [uvStatus, setUvStatus] = useState('');
   const [showSearchBox, setShowSearchBox] = useState(false);
@@ -20,6 +19,16 @@ export default function Main() {
   const [closeOverlayBtn, setCloseOverlayBtn] = useState(false);
   const [locationMinimaliseHeading, setLocationMinimaliseHeading] = useState({ display: 'none' });
 
+  const [locationName, setLocationName] = useState('');
+  const [uvIndex, setUvIndex] = useState(0);
+  const [temp, setTemp] = useState(0);
+  const [description, setDescription] = useState('');
+  const [humidity, setHumidity] = useState(0);
+  const [rain, setRain] = useState(0);
+  const [wind, setWind] = useState(0);
+  const [sunrise, setSunrise] = useState('Sunrise:');
+  const [sunset, setSunset] = useState('');
+
   useEffect(() => {
     if (navigator.geolocation) {
       const id = navigator.geolocation.watchPosition(
@@ -29,6 +38,7 @@ export default function Main() {
             longitude: position.coords.longitude,
           });
           setError(null);
+          getApiData(position.coords.latitude, position.coords.longitude); 
         },
         (error) => {
           setError(error.message);
@@ -42,9 +52,49 @@ export default function Main() {
       }
     };
   }, [watchId]);
+
+  function getCoordinates(cityName) {
+    const url = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=306ad60a4571a68d6e54fe75ea65c224`;
+    return fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                const { lat, lon } = data[0];
+                setLocation({ latitude: lat, longitude: lon });
+                getApiData(lat, lon);
+            } else {
+                throw new Error('City not found');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching coordinates:', error);
+        });
+  }
+
+  function getApiData(lat, lon) {
+    fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,daily,alerts&appid=306ad60a4571a68d6e54fe75ea65c224`)
+      .then(response => response.json())
+      .then(data => {
+        const current = data.current; 
+        setLocationName(data.timezone); 
+        setUvIndex(current.uvi);        
+        setTemp(current.temp);           
+        setHumidity(current.humidity);  
+        setWind(current.wind_speed);   
+        setSunrise(formatTime(current.sunrise));  
+        setSunset(formatTime(current.sunset)); 
+        setDescription(current.weather[0].description);
+      })
+      .catch(error => console.error('Error fetching weather data:', error));
+  }
   
-  //location.latitude
-  //location.longitude
+
+  function formatTime(timestamp) {
+    const date = new Date(timestamp * 1000);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    return `${hours}.${minutes} ${hours >= 12 ? 'PM' : 'AM'}`;
+  }
 
   useEffect(() => {
     let fillColor = '';
@@ -67,6 +117,7 @@ export default function Main() {
   }, [uvIndex]);
 
   const searchLocation = () => {
+    getCoordinates(document.querySelector('.searchBoxInput').value);
     setShowSearchBox(false);
     setShowSetLocation(true);
   };
@@ -107,18 +158,18 @@ export default function Main() {
     <div className="app">
       <div className="app-container">
         <h1 className="main-location-name text-light display-6" style={locationMinimalise}>
-          University of Kelaniya
+        {locationName}
         </h1>
         <p className="main-temp text-light h1" style={locationMinimalise}>
-          35&deg;
+          {temp}&deg;
         </p>
         <p className="main-weather-description" style={locationMinimalise}>
-          Broken Clouds
+          {description}
         </p>
         <div className="minimalise-heading" style={locationMinimaliseHeading}>
-          <p className="minimalise-location-name text-light">University of Kelaniya</p>
+          <p className="minimalise-location-name text-light">{locationName}</p>
           <div className="minimalise-description">
-            <swap className="temp">35&deg;</swap> | <swap className="weather">Broken Clouds</swap>
+            <swap className="temp">{temp}&deg;</swap> | <swap className="weather">{description}</swap>
           </div>
         </div>
 
@@ -127,12 +178,12 @@ export default function Main() {
             <img className="min-info-icons" src="./Assets/Images/humidity.png" />
             <p className="min-info-icon-name">Humidity</p>
           </div>
-          <p className="min-info-value text-light ms-1">59%</p>
+          <p className="min-info-value text-light ms-1">{humidity}</p>
           <div className="min-info-icon ms-5">
             <img className="min-info-icons2" src="./Assets/Images/rain.png" />
             <p className="min-info-icon-name">Rain</p>
           </div>
-          <p className="min-info-value text-light ms-1">59%</p>
+          <p className="min-info-value text-light ms-1">{rain}</p>
           {showSearchBox && (
             <div className="searchBox">
               <Form.Control className="searchBoxInput" type="text" placeholder="Search by city" />
@@ -200,14 +251,14 @@ export default function Main() {
                 <div className="info-bar">
                   <img className="info-icons" src="./Assets/Images/sun-rise.png" />
                 </div>
-                <p className="text-light hb3">5.34 AM</p>
-                <p className="text-light hb6">Sunset: 6.50 PM</p>
+                <p className="text-light hb3">{sunrise}</p>
+                <p className="text-light hb6">Sunset: {sunset}</p>
               </div>
               <div className="wind">
                 <div className="info-bar">
                   <img className="info-icons" src="./Assets/Images/wind.png" />
                 </div>
-                <p className="text-light hb4">9.7</p>
+                <p className="text-light hb4">{wind}</p>
                 <p className="text-light hb5">Km/h</p>
               </div>
             </div>
