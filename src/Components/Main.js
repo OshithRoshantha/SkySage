@@ -30,73 +30,6 @@ export default function Main() {
   const [sunset, setSunset] = useState('');
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      const id = navigator.geolocation.watchPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-          setError(null);
-          getApiData(position.coords.latitude, position.coords.longitude); 
-        },
-        (error) => {
-          setError(error.message);
-        }
-      );
-      setWatchId(id);
-    }
-    return () => {
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-      }
-    };
-  }, [watchId]);
-
-  function getCoordinates(cityName) {
-    const url = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=306ad60a4571a68d6e54fe75ea65c224`;
-    return fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.length > 0) {
-                const { lat, lon } = data[0];
-                setLocation({ latitude: lat, longitude: lon });
-                getApiData(lat, lon);
-            } else {
-                throw new Error('City not found');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching coordinates:', error);
-        });
-  }
-
-  function getApiData(lat, lon) {
-    fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,daily,alerts&appid=306ad60a4571a68d6e54fe75ea65c224`)
-      .then(response => response.json())
-      .then(data => {
-        const current = data.current; 
-        setLocationName(data.timezone); 
-        setUvIndex(current.uvi);        
-        setTemp(current.temp);           
-        setHumidity(current.humidity);  
-        setWind(current.wind_speed);   
-        setSunrise(formatTime(current.sunrise));  
-        setSunset(formatTime(current.sunset)); 
-        setDescription(current.weather[0].description);
-      })
-      .catch(error => console.error('Error fetching weather data:', error));
-  }
-  
-
-  function formatTime(timestamp) {
-    const date = new Date(timestamp * 1000);
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    return `${hours}.${minutes} ${hours >= 12 ? 'PM' : 'AM'}`;
-  }
-
-  useEffect(() => {
     let fillColor = '';
     let uvStatus = '';
     if (uvIndex <= 2) {
@@ -117,7 +50,6 @@ export default function Main() {
   }, [uvIndex]);
 
   const searchLocation = () => {
-    getCoordinates(document.querySelector('.searchBoxInput').value);
     setShowSearchBox(false);
     setShowSetLocation(true);
   };
