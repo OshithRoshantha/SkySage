@@ -6,8 +6,9 @@ import './Main.css';
 import ForcastCard from './ForcastCard';
 
 export default function Main() {
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
   const [fillColor, setFillColor] = useState('');
-  const [visibilityStatus, setVisibilityStatus] = useState('');
+  const [uvStatus, setuvStatus] = useState('');
   const [showSearchBox, setShowSearchBox] = useState(false);
   const [showSetLocation, setShowSetLocation] = useState(true);
   const [overlayStyle, setOverlayStyle] = useState({});
@@ -16,28 +17,52 @@ export default function Main() {
   const [closeOverlayBtn, setCloseOverlayBtn] = useState(false);
   const [locationMinimaliseHeading, setLocationMinimaliseHeading] = useState({ display: 'none' });
 
-  const [locationName, setLocationName] = useState('Piliyandala');
-  const [visibility, setVisibility] = useState();
+  const [locationName, setLocationName] = useState();
+  const [uv, setUv] = useState();
   const [temp, setTemp] = useState(35);
-  const [description, setDescription] = useState('Partly Cloudy');
+  const [description, setDescription] = useState();
   const [humidity, setHumidity] = useState(0);
   const [pressure, setPressure] = useState(0);
   const [wind, setWind] = useState(0);
-  const [sunrise, setSunrise] = useState('5.53AM');
-  const [sunset, setSunset] = useState('6.00PM');
+  const [dew, setDew] = useState(0);
+  const [precip, setPrecip] = useState(0);
+  const [cloud, setCloud] = useState(0);
+  const [visible, setVisible] = useState(0);
+
+
+useEffect(() => {
+  if (navigator.geolocation) {
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.error("Error getting location:", error.message);
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    );
+    return () => navigator.geolocation.clearWatch(watchId);
+  }
+}, []);
 
   async function getWetherData(){
-    const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Piliyandala&appid=${process.env.REACT_APP_WEATHER_API_KEY}&units=metric`);
+    console.log(location.latitude, location.longitude);
+    const response = await fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=${location.latitude},${location.longitude}`);
     const data = await response.json();
-    setLocationName('Colombo');
-    setTemp(data["main"]["temp"]);
-    setDescription(data["weather"][0]["main"]);
-    setHumidity(data["main"]["humidity"]+'%');
-    setPressure(data["main"]["pressure"]+'hPa');
-    setSunrise(converTime(data["sys"]["sunrise"]));
-    setSunset(converTime(data["sys"]["sunset"]));
-    setWind(data["wind"]["speed"]);
-    setVisibility(data["visibility"]+'Km');
+    setLocationName(data["location"]["name"]);
+    setTemp(data["current"]["temp_c"]);
+    setDescription(data["current"]["condition"]["text"]);
+    setHumidity(data["current"]["humidity"]);
+    setWind(data["current"]["wind_kph"]);
+    setUv(data["current"]["uv"]);
+    setPressure(data["current"]["pressure_mb"]);
+    setDew(data["current"]["dewpoint_c"]);
+    setPrecip(data["current"]["precip_mm"]);
+    setCloud(data["current"]["cloud"]);
+    setVisible(data["current"]["vis_km"]);
   }
 
   function converTime(unixTimestamp) {
@@ -53,23 +78,26 @@ export default function Main() {
 
   useEffect(() => {
     let fillColor = '';
-    let visibilityStatus = '';
-    if (visibility <= 1000) {
-      fillColor = '#FF0000';
-      visibilityStatus = 'VERY POOR';
-    } else if (visibility <= 4999) {
-      fillColor = '##FFA500';
-      visibilityStatus = 'POOR';
-    } else if (visibility <= 9999) {
-      fillColor = '#FFFF00';
-      visibilityStatus = 'MODERATE';
-    } else {
+    let uvStatus = '';
+    if (uv <= 3) {
       fillColor = '#008000';
-      visibilityStatus = 'GOOD';
+      uvStatus = 'LOW';
+    } else if (uv <= 6) {
+      fillColor = '#FFFF00';
+      uvStatus = 'MODERATE';
+    } else if (uv <= 9) {
+      fillColor = '#FFA500';
+      uvStatus = 'HIGH';
+    } else if (uv <= 10) {
+      fillColor = '#FF0000';
+      uvStatus = 'VERY HIGH';
+    } else {
+      fillColor = '#800080';
+      uvStatus = 'EXTREME';
     }
     setFillColor(fillColor);
-    setVisibilityStatus(visibilityStatus);
-  }, [visibility]);
+    setuvStatus(uvStatus);
+  }, [uv]);
 
   const searchLocation = () => {
     setShowSearchBox(false);
@@ -117,7 +145,7 @@ export default function Main() {
         {locationName}
         </h1>
         <p className="main-temp text-light h1" style={locationMinimalise}>
-          {temp}&deg;
+          {temp}&deg;c
         </p>
         <p className="main-weather-description" style={locationMinimalise}>
           {description}
@@ -125,7 +153,7 @@ export default function Main() {
         <div className="minimalise-heading" style={locationMinimaliseHeading}>
           <p className="minimalise-location-name text-light">{locationName}</p>
           <div className="minimalise-description">
-            <swap className="temp">{temp}&deg;</swap> | <swap className="weather">{description}</swap>
+            <swap className="temp">{temp}&deg;c</swap> | <swap className="weather">{description}</swap>
           </div>
         </div>
 
@@ -158,24 +186,24 @@ export default function Main() {
             </div>
           )}
           <div className="preview-header">
-            <p className="forcast-type text-light">More Weather Informations</p>
+            <p className="forcast-type text-light">Additional Weather Insights</p>
             <hr className="divider text-light"></hr>
           </div>
           <Swiper className="ms-3" slidesPerView={4} spaceBetween={18} slidesPerGroup={1}>
             <SwiperSlide>
-              <ForcastCard />
+              <ForcastCard heading={'Dew'} value={dew} unit={'°c'} icon={'dew'}/>
             </SwiperSlide>
             <SwiperSlide>
-              <ForcastCard />
+              <ForcastCard heading={'Precip'} value={precip} unit={'mm'} icon={'rain'}/>
             </SwiperSlide>
             <SwiperSlide>
-              <ForcastCard />
+              <ForcastCard heading={'Cloud'} value={cloud} unit={'%'} icon={'cloud'}/>
             </SwiperSlide>
             <SwiperSlide>
-              <ForcastCard />
+              <ForcastCard heading={'Visibile'} value={visible} unit={'km'} icon={'visible'}/>
             </SwiperSlide>
             <SwiperSlide>
-              <ForcastCard />
+              <ForcastCard heading={'Pressure'} value={pressure} unit={'mb'} icon={'pressure'}/>
             </SwiperSlide>
           </Swiper>
           <div className="more-info">
@@ -183,29 +211,28 @@ export default function Main() {
               <div className="info-bar">
                 <img className="info-icons" src="./Assets/Images/uv-index.png" />
               </div>
-              <p className="text-light hb1">{visibility}</p>
-              <p className="text-light hb2">{visibilityStatus}</p>
+              <p className="text-light hb1">{uv}</p>
+              <p className="text-light hb2">{uvStatus}</p>
               <ProgressBar
                 className="uv-scale"
                 variant="light"
-                now={10000 - visibility}
+                now={100-uv*10}
                 style={{ marginLeft: '6%', marginTop: '1%', height: '1px', width: '85%', backgroundColor: `${fillColor}` }}
               />
             </div>
             <div className="info-row">
               <div className="sun-rise">
                 <div className="info-bar">
-                  <img className="info-icons" src="./Assets/Images/sun-rise.png" />
+                  <img className="info-icons" src="./Assets/Images/humidity-val.png" />
                 </div>
-                <p className="text-light hb3">{sunrise}</p>
-                <p className="text-light hb6">Sunset: {sunset}</p>
+                <p className="text-light hb4">{humidity}<span className='fs-6'>%</span></p>
               </div>
               <div className="wind">
                 <div className="info-bar">
                   <img className="info-icons" src="./Assets/Images/wind.png" />
                 </div>
-                <p className="text-light hb4">{wind}</p>
-                <p className="text-light hb5">Metre/Sec</p>
+                <p className="text-light hb4">{wind}<span className='fs-6'>Kmph</span></p>
+                
               </div>
             </div>
           </div>
