@@ -67,14 +67,14 @@ export default function Main() {
     setIcon(data["current"]["condition"]["icon"]);
   }
 
-  useEffect(() => {
+/*  useEffect(() => {
     const handleResize = () => {
       setIsDesktop(window.innerWidth >= 1024);
     };
     handleResize(); 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize); 
-  }, []);
+  }, []);*/
 
   useEffect(() => {
     if (useGeolocation && navigator.geolocation) {
