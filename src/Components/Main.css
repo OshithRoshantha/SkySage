@@ -2,6 +2,37 @@
     display: flex;
     justify-content: center;
 }
+.desktop{
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    z-index: 9999;
+    background-color:#272c4d;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.main-logo{
+    height: 200px;
+    position: absolute;
+    bottom: 0;
+}
+.innerDesktop{
+    width: 30%;
+    display: flex;
+}
+.innerDesktop2{
+    padding-left: 2%;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    justify-content: center;
+    font-size: 90%;
+}
+.nD{
+    height: 100px;
+}
 .app-container{
     padding-top: 18%;
     width: 88%;

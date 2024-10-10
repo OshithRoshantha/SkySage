@@ -6,6 +6,7 @@ import './Main.css';
 import ForcastCard from './ForcastCard';
 
 export default function Main() {
+  const [isDesktop, setIsDesktop] = useState(false);
   const [location, setLocation] = useState({ latitude: null, longitude: null });
   const [manualLocation, setManualLocation] = useState('');
   const [useGeolocation, setUseGeolocation] = useState(true);
@@ -65,6 +66,15 @@ export default function Main() {
     setVisible(data["current"]["vis_km"]);
     setIcon(data["current"]["condition"]["icon"]);
   }
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    handleResize(); 
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize); 
+  }, []);
 
   useEffect(() => {
     if (useGeolocation && navigator.geolocation) {
@@ -161,6 +171,16 @@ export default function Main() {
 
   return (
     <div className="app">
+      {isDesktop && (<div className='desktop'>
+        <img className='main-logo' src="./Assets/Logos/logo-Main.png"/>
+        <div className='innerDesktop'>
+          <img className="nD"src="./Assets/Images/noDesktop.png" />
+          <div className='innerDesktop2'>
+          <p className='fs-7 ' align='left'>Designed for mobile devices and is not available on desktop.</p>
+          <p className='fs-7 ' align='left'>Please access <b>SkySage</b> on your smartphone or tablet.</p></div>
+        </div>
+      </div>)}
+      {!isDesktop && (
       <div className="app-container">
         <h1 className="main-location-name text-light display-6" style={locationMinimalise}>
         {locationName}
@@ -263,7 +283,7 @@ export default function Main() {
             </div>
           </div>
         </div>
-      </div>
+      </div>)}
       <div className="footer">
         <p className="author">Project by Oshith Roshantha 😇</p>
       </div>
