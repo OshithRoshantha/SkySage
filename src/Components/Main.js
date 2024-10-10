@@ -67,14 +67,14 @@ export default function Main() {
     setIcon(data["current"]["condition"]["icon"]);
   }
 
-/*  useEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       setIsDesktop(window.innerWidth >= 1024);
     };
     handleResize(); 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize); 
-  }, []);*/
+  }, []);
 
   useEffect(() => {
     if (useGeolocation && navigator.geolocation) {
@@ -87,10 +87,16 @@ export default function Main() {
         },
         (error) => {
           console.error("Error fetching location:", error);
+        },
+        {
+          enableHighAccuracy: true, 
+          timeout: 5000, 
+          maximumAge: 0, 
         }
       );
     }
   }, [useGeolocation]);
+  
 
   useEffect(() => {
     if (useGeolocation) {
