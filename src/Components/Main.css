@@ -196,7 +196,8 @@ p{
 }
 .minimalise-heading{
     font-size: 110%;
-    margin-bottom: 20%;
+    margin-top: -10%;
+    margin-bottom: 15%;
 }
 .more-info{
     width: 100%;
