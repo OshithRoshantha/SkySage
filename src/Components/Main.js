@@ -214,6 +214,7 @@ export default function Main() {
               </div>
             </div>
           )}
+          <div className='button-tray'>
           {showSetLocation && (
             <div className="getLocation" onClick={toggleSearchBox}>
               <img className="arrow" src="./Assets/Images/search.png" />
@@ -224,6 +225,7 @@ export default function Main() {
               <img className="arrow" src="./Assets/Images/arrow.png" />
             </div>
           )}
+          </div>
         </div>
         <img className="weather-preview" src={icon}></img>
         <div className="forcast-conatiner" style={overlayStyle}>
@@ -290,9 +292,6 @@ export default function Main() {
           </div>
         </div>
       </div>)}
-      <div className="footer">
-        <p className="author">Project by Oshith Roshantha 😇</p>
-      </div>
     </div>
   );
 }
