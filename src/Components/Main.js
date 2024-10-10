@@ -6,9 +6,6 @@ import './Main.css';
 import ForcastCard from './ForcastCard';
 
 export default function Main() {
-  const [location, setLocation] = useState({ latitude: null, longitude: null });
-  const [error, setError] = useState(null);
-  const [watchId, setWatchId] = useState(null);
   const [fillColor, setFillColor] = useState('');
   const [uvStatus, setUvStatus] = useState('');
   const [showSearchBox, setShowSearchBox] = useState(false);
@@ -19,15 +16,15 @@ export default function Main() {
   const [closeOverlayBtn, setCloseOverlayBtn] = useState(false);
   const [locationMinimaliseHeading, setLocationMinimaliseHeading] = useState({ display: 'none' });
 
-  const [locationName, setLocationName] = useState('');
-  const [uvIndex, setUvIndex] = useState(0);
-  const [temp, setTemp] = useState(0);
-  const [description, setDescription] = useState('');
+  const [locationName, setLocationName] = useState('Piliyandala');
+  const [uvIndex, setUvIndex] = useState(5);
+  const [temp, setTemp] = useState(35);
+  const [description, setDescription] = useState('Partly Cloudy');
   const [humidity, setHumidity] = useState(0);
   const [rain, setRain] = useState(0);
   const [wind, setWind] = useState(0);
-  const [sunrise, setSunrise] = useState('Sunrise:');
-  const [sunset, setSunset] = useState('');
+  const [sunrise, setSunrise] = useState('5.53AM');
+  const [sunset, setSunset] = useState('6.00PM');
 
   useEffect(() => {
     let fillColor = '';
