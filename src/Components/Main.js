@@ -18,6 +18,7 @@ export default function Main() {
   const [locationMinimaliseHeading, setLocationMinimaliseHeading] = useState({ display: 'none' });
 
   const [locationName, setLocationName] = useState();
+  const [icon, setIcon] = useState();
   const [uv, setUv] = useState();
   const [temp, setTemp] = useState(35);
   const [description, setDescription] = useState();
@@ -63,6 +64,7 @@ useEffect(() => {
     setPrecip(data["current"]["precip_mm"]);
     setCloud(data["current"]["cloud"]);
     setVisible(data["current"]["vis_km"]);
+    setIcon(data["current"]["condition"]["icon"]);
   }
 
   function converTime(unixTimestamp) {
@@ -173,7 +175,7 @@ useEffect(() => {
             </div>
           )}
         </div>
-        <div className="weather-preview"></div>
+        <img className="weather-preview" src={icon}></img>
         <div className="forcast-conatiner" style={overlayStyle}>
           {openOverlayBtn && (
             <div className="div-open" onClick={openOverlay}>
