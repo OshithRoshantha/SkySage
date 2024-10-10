@@ -6,6 +6,10 @@
     cursor: pointer;
     border: solid 0.1px rgb(45, 60, 119);
     color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 .card-conatiner:hover{
     background-color: #202b83;

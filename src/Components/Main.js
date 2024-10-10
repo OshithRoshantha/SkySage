@@ -7,10 +7,13 @@ import ForcastCard from './ForcastCard';
 
 export default function Main() {
   const [location, setLocation] = useState({ latitude: null, longitude: null });
+  const [manualLocation, setManualLocation] = useState('');
+  const [useGeolocation, setUseGeolocation] = useState(true);
   const [fillColor, setFillColor] = useState('');
   const [uvStatus, setuvStatus] = useState('');
   const [showSearchBox, setShowSearchBox] = useState(false);
-  const [showSetLocation, setShowSetLocation] = useState(true);
+  const [showSetLocation, setShowSetLocation] = useState(true); 
+  const [showCurrentLocation, setShowCurrentLocation] = useState(false);
   const [overlayStyle, setOverlayStyle] = useState({});
   const [locationMinimalise, setLocationMinimalise] = useState({});
   const [openOverlayBtn, setOpenOverlayBtn] = useState(true);
@@ -30,29 +33,25 @@ export default function Main() {
   const [cloud, setCloud] = useState(0);
   const [visible, setVisible] = useState(0);
 
-
-useEffect(() => {
-  if (navigator.geolocation) {
-    const watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      },
-      (error) => {
-        console.error("Error getting location:", error.message);
-      },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-    );
-    return () => navigator.geolocation.clearWatch(watchId);
+  async function getWeatherData() {
+    if (location) {
+      const response = await fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=${location.latitude},${location.longitude}`);
+      const data = await response.json();
+      updateWeatherData(data);
+    }
   }
-}, []);
 
-  async function getWetherData(){
-    console.log(location.latitude, location.longitude);
-    const response = await fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=${location.latitude},${location.longitude}`);
-    const data = await response.json();
+  async function getWeatherDataManual() {
+    if (manualLocation) {
+      const response = await fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=${manualLocation}`);
+      const data = await response.json();
+      if(!data.error) {
+        updateWeatherData(data);
+      }
+    }
+  }
+
+  function updateWeatherData(data) {
     setLocationName(data["location"]["name"]);
     setTemp(data["current"]["temp_c"]);
     setDescription(data["current"]["condition"]["text"]);
@@ -67,16 +66,29 @@ useEffect(() => {
     setIcon(data["current"]["condition"]["icon"]);
   }
 
-  function converTime(unixTimestamp) {
-    const date = new Date(unixTimestamp * 1000); 
-    const options = {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: 'UTC' 
-    };
-    return new Intl.DateTimeFormat('en-US', options).format(date);
-}
+  useEffect(() => {
+    if (useGeolocation && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error fetching location:", error);
+        }
+      );
+    }
+  }, [useGeolocation]);
+
+  useEffect(() => {
+    if (useGeolocation) {
+      getWeatherData();
+    } else {
+      getWeatherDataManual();
+    }
+  }, [location, manualLocation, useGeolocation]);
 
   useEffect(() => {
     let fillColor = '';
@@ -103,12 +115,22 @@ useEffect(() => {
 
   const searchLocation = () => {
     setShowSearchBox(false);
-    setShowSetLocation(true);
+    setShowSetLocation(false);
+    setManualLocation(document.querySelector('.searchBoxInput').value);
+    setUseGeolocation(false);
+    setShowCurrentLocation(true);
   };
 
   const toggleSearchBox = () => {
     setShowSearchBox(!showSearchBox);
     setShowSetLocation(false);
+  };
+
+  const toCurrentSearch = () => {
+    setShowCurrentLocation(false);
+    setManualLocation('');
+    setUseGeolocation(true);
+    setShowSetLocation(true);
   };
 
   const openOverlay = () => {
@@ -135,10 +157,7 @@ useEffect(() => {
     });
     setCloseOverlayBtn(false);
     setOpenOverlayBtn(true);
-    setShowSetLocation(true);
   };
-
-  getWetherData();
 
   return (
     <div className="app">
@@ -162,7 +181,7 @@ useEffect(() => {
         <div className="min-info">
           {showSearchBox && (
             <div className="searchBox">
-              <Form.Control className="searchBoxInput" type="text" placeholder="Search by city" />
+              <Form.Control className="searchBoxInput" type="text" placeholder="Search by city"/>
               <div className="search-btn" onClick={searchLocation}>
                 <img className="target" src="./Assets/Images/target.png" />
                 &nbsp;&nbsp;Set location
@@ -172,6 +191,11 @@ useEffect(() => {
           {showSetLocation && (
             <div className="getLocation" onClick={toggleSearchBox}>
               <img className="arrow" src="./Assets/Images/search.png" />
+            </div>
+          )}
+          {showCurrentLocation && (
+            <div className="currentLocation" onClick={toCurrentSearch}>
+              <img className="arrow" src="./Assets/Images/arrow.png" />
             </div>
           )}
         </div>
@@ -191,7 +215,7 @@ useEffect(() => {
             <p className="forcast-type text-light">Additional Weather Insights</p>
             <hr className="divider text-light"></hr>
           </div>
-          <Swiper className="ms-3" slidesPerView={4} spaceBetween={18} slidesPerGroup={1}>
+          <Swiper className="ms-3" slidesPerView={4} spaceBetween={18} slidesPerGroup={1} >
             <SwiperSlide>
               <ForcastCard heading={'Dew'} value={dew} unit={'°c'} icon={'dew'}/>
             </SwiperSlide>
@@ -202,7 +226,7 @@ useEffect(() => {
               <ForcastCard heading={'Cloud'} value={cloud} unit={'%'} icon={'cloud'}/>
             </SwiperSlide>
             <SwiperSlide>
-              <ForcastCard heading={'Visibile'} value={visible} unit={'km'} icon={'visible'}/>
+              <ForcastCard heading={'Visible'} value={visible} unit={'km'} icon={'visible'}/>
             </SwiperSlide>
             <SwiperSlide>
               <ForcastCard heading={'Pressure'} value={pressure} unit={'mb'} icon={'pressure'}/>
