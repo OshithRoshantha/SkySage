@@ -36,7 +36,7 @@ export default function Main() {
 
   async function getWeatherData() {
     if (location) {
-      const response = await fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=${location.latitude},${location.longitude}`);
+      const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=${location.latitude},${location.longitude}`);
       const data = await response.json();
       updateWeatherData(data);
     }
@@ -44,7 +44,7 @@ export default function Main() {
 
   async function getWeatherDataManual() {
     if (manualLocation) {
-      const response = await fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=${manualLocation}`);
+      const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=${manualLocation}`);
       const data = await response.json();
       if(!data.error) {
         updateWeatherData(data);
