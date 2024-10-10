@@ -51,8 +51,7 @@
     background-position: center;
 }
 .visible{
-    background-image: url('https://img.icons8.com/ios/50/000000/visibility.png');
-    filter: invert(100%);
+    background-image: url('visible.png');
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
