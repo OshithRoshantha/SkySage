@@ -7,7 +7,7 @@ import ForcastCard from './ForcastCard';
 
 export default function Main() {
   const [fillColor, setFillColor] = useState('');
-  const [uvStatus, setUvStatus] = useState('');
+  const [visibilityStatus, setVisibilityStatus] = useState('');
   const [showSearchBox, setShowSearchBox] = useState(false);
   const [showSetLocation, setShowSetLocation] = useState(true);
   const [overlayStyle, setOverlayStyle] = useState({});
@@ -17,34 +17,59 @@ export default function Main() {
   const [locationMinimaliseHeading, setLocationMinimaliseHeading] = useState({ display: 'none' });
 
   const [locationName, setLocationName] = useState('Piliyandala');
-  const [uvIndex, setUvIndex] = useState(5);
+  const [visibility, setVisibility] = useState();
   const [temp, setTemp] = useState(35);
   const [description, setDescription] = useState('Partly Cloudy');
   const [humidity, setHumidity] = useState(0);
-  const [rain, setRain] = useState(0);
+  const [pressure, setPressure] = useState(0);
   const [wind, setWind] = useState(0);
   const [sunrise, setSunrise] = useState('5.53AM');
   const [sunset, setSunset] = useState('6.00PM');
 
+  async function getWetherData(){
+    const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Piliyandala&appid=${process.env.REACT_APP_WEATHER_API_KEY}&units=metric`);
+    const data = await response.json();
+    setLocationName('Colombo');
+    setTemp(data["main"]["temp"]);
+    setDescription(data["weather"][0]["main"]);
+    setHumidity(data["main"]["humidity"]+'%');
+    setPressure(data["main"]["pressure"]+'hPa');
+    setSunrise(converTime(data["sys"]["sunrise"]));
+    setSunset(converTime(data["sys"]["sunset"]));
+    setWind(data["wind"]["speed"]);
+    setVisibility(data["visibility"]+'Km');
+  }
+
+  function converTime(unixTimestamp) {
+    const date = new Date(unixTimestamp * 1000); 
+    const options = {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'UTC' 
+    };
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+}
+
   useEffect(() => {
     let fillColor = '';
-    let uvStatus = '';
-    if (uvIndex <= 2) {
-      fillColor = '#00FF00';
-      uvStatus = 'LOW';
-    } else if (uvIndex <= 5) {
+    let visibilityStatus = '';
+    if (visibility <= 1000) {
+      fillColor = '#FF0000';
+      visibilityStatus = 'VERY POOR';
+    } else if (visibility <= 4999) {
+      fillColor = '##FFA500';
+      visibilityStatus = 'POOR';
+    } else if (visibility <= 9999) {
       fillColor = '#FFFF00';
-      uvStatus = 'MODERATE';
-    } else if (uvIndex <= 7) {
-      fillColor = '#FFA500';
-      uvStatus = 'HIGH';
+      visibilityStatus = 'MODERATE';
     } else {
-      fillColor = '#FF4500';
-      uvStatus = 'VERY HIGH';
+      fillColor = '#008000';
+      visibilityStatus = 'GOOD';
     }
     setFillColor(fillColor);
-    setUvStatus(uvStatus);
-  }, [uvIndex]);
+    setVisibilityStatus(visibilityStatus);
+  }, [visibility]);
 
   const searchLocation = () => {
     setShowSearchBox(false);
@@ -83,6 +108,8 @@ export default function Main() {
     setShowSetLocation(true);
   };
 
+  getWetherData();
+
   return (
     <div className="app">
       <div className="app-container">
@@ -103,16 +130,6 @@ export default function Main() {
         </div>
 
         <div className="min-info">
-          <div className="min-info-icon">
-            <img className="min-info-icons" src="./Assets/Images/humidity.png" />
-            <p className="min-info-icon-name">Humidity</p>
-          </div>
-          <p className="min-info-value text-light ms-1">{humidity}</p>
-          <div className="min-info-icon ms-5">
-            <img className="min-info-icons2" src="./Assets/Images/rain.png" />
-            <p className="min-info-icon-name">Rain</p>
-          </div>
-          <p className="min-info-value text-light ms-1">{rain}</p>
           {showSearchBox && (
             <div className="searchBox">
               <Form.Control className="searchBoxInput" type="text" placeholder="Search by city" />
@@ -123,7 +140,7 @@ export default function Main() {
             </div>
           )}
           {showSetLocation && (
-            <div className="getLocation ms-3" onClick={toggleSearchBox}>
+            <div className="getLocation" onClick={toggleSearchBox}>
               <img className="arrow" src="./Assets/Images/search.png" />
             </div>
           )}
@@ -141,7 +158,7 @@ export default function Main() {
             </div>
           )}
           <div className="preview-header">
-            <p className="forcast-type text-light">Hourly Forecast</p>
+            <p className="forcast-type text-light">More Weather Informations</p>
             <hr className="divider text-light"></hr>
           </div>
           <Swiper className="ms-3" slidesPerView={4} spaceBetween={18} slidesPerGroup={1}>
@@ -166,12 +183,12 @@ export default function Main() {
               <div className="info-bar">
                 <img className="info-icons" src="./Assets/Images/uv-index.png" />
               </div>
-              <p className="text-light hb1">{uvIndex}</p>
-              <p className="text-light hb2">{uvStatus}</p>
+              <p className="text-light hb1">{visibility}</p>
+              <p className="text-light hb2">{visibilityStatus}</p>
               <ProgressBar
                 className="uv-scale"
                 variant="light"
-                now={100 - uvIndex * 10}
+                now={10000 - visibility}
                 style={{ marginLeft: '6%', marginTop: '1%', height: '1px', width: '85%', backgroundColor: `${fillColor}` }}
               />
             </div>
@@ -188,7 +205,7 @@ export default function Main() {
                   <img className="info-icons" src="./Assets/Images/wind.png" />
                 </div>
                 <p className="text-light hb4">{wind}</p>
-                <p className="text-light hb5">Km/h</p>
+                <p className="text-light hb5">Metre/Sec</p>
               </div>
             </div>
           </div>
