@@ -86,6 +86,20 @@ export default function Main() {
           });
         },
         (error) => {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              alert("Location access is denied. Please enable location services.");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              alert("Location information is unavailable.");
+              break;
+            case error.TIMEOUT:
+              alert("The request to get location timed out. Please try again.");
+              break;
+            default:
+              alert("An unknown error occurred while fetching location.");
+              break;
+          }
           console.error("Error fetching location:", error);
         },
         {
