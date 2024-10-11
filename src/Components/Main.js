@@ -77,8 +77,10 @@ export default function Main() {
   }, []);
 
   useEffect(() => {
+    let watchId;
+  
     if (useGeolocation && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
+      watchId = navigator.geolocation.watchPosition(
         (position) => {
           setLocation({
             latitude: position.coords.latitude,
@@ -103,15 +105,20 @@ export default function Main() {
           console.error("Error fetching location:", error);
         },
         {
-          enableHighAccuracy: true, 
-          timeout: 5000, 
-          maximumAge: 0, 
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
         }
       );
     }
+  
+    return () => {
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
   }, [useGeolocation]);
   
-
   useEffect(() => {
     if (useGeolocation) {
       getWeatherData();
@@ -119,7 +126,7 @@ export default function Main() {
       getWeatherDataManual();
     }
   }, [location, manualLocation, useGeolocation]);
-
+  
   useEffect(() => {
     let fillColor = '';
     let uvStatus = '';
