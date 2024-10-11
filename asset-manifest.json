@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/SkySage/static/css/main.f16bc365.css",
-    "main.js": "/SkySage/static/js/main.5ce89d9c.js",
+    "main.js": "/SkySage/static/js/main.d47ff131.js",
     "static/js/453.66f57dbf.chunk.js": "/SkySage/static/js/453.66f57dbf.chunk.js",
     "static/media/visible.png": "/SkySage/static/media/visible.4a56dc72e088777e97ec.png",
     "index.html": "/SkySage/index.html",
     "main.f16bc365.css.map": "/SkySage/static/css/main.f16bc365.css.map",
-    "main.5ce89d9c.js.map": "/SkySage/static/js/main.5ce89d9c.js.map",
+    "main.d47ff131.js.map": "/SkySage/static/js/main.d47ff131.js.map",
     "453.66f57dbf.chunk.js.map": "/SkySage/static/js/453.66f57dbf.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f16bc365.css",
-    "static/js/main.5ce89d9c.js"
+    "static/js/main.d47ff131.js"
   ]
 }
