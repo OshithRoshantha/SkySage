@@ -39,7 +39,6 @@ export default function Main() {
     if (location) {
       const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=${location.latitude},${location.longitude}`);
       const data = await response.json();
-      setFetching(false);
       updateWeatherData(data);
     }
   }
@@ -88,6 +87,7 @@ export default function Main() {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
           });
+          setFetching(false);
         },
         (error) => {
           switch (error.code) {
