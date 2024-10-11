@@ -2,6 +2,30 @@
     display: flex;
     justify-content: center;
 }
+.loading{
+    width: 100vw;
+    height: 100vh;
+    background-color: #272c4d;
+    z-index: 9999;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10%;
+}
+.loadingText{
+    color: white;
+    font-size: 90%;
+}
+.loadingText2{
+    font-size: 70%;
+    color: white;
+}
+.loadingGif{
+    height: 50px;
+    width: 50px;
+}
 .desktop{
     width: 100vw;
     height: 100vh;

@@ -7,6 +7,7 @@ import ForcastCard from './ForcastCard';
 
 export default function Main() {
   const [isDesktop, setIsDesktop] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [location, setLocation] = useState({ latitude: null, longitude: null });
   const [manualLocation, setManualLocation] = useState('');
   const [useGeolocation, setUseGeolocation] = useState(true);
@@ -38,6 +39,7 @@ export default function Main() {
     if (location) {
       const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${process.env.REACT_APP_WEATHER_API_KEY}&q=${location.latitude},${location.longitude}`);
       const data = await response.json();
+      setFetching(false);
       updateWeatherData(data);
     }
   }
@@ -91,15 +93,6 @@ export default function Main() {
           switch (error.code) {
             case error.PERMISSION_DENIED:
               alert("Location access is denied. Please enable location services.");
-              break;
-            case error.POSITION_UNAVAILABLE:
-              alert("Location information is unavailable.");
-              break;
-            case error.TIMEOUT:
-              alert("The request to get location timed out. Please try again.");
-              break;
-            default:
-              alert("An unknown error occurred while fetching location.");
               break;
           }
           console.error("Error fetching location:", error);
@@ -198,6 +191,11 @@ export default function Main() {
 
   return (
     <div className="app">
+      {fetching && (<div className="loading">
+        <img src="./Assets/Images/map.gif" className='loadingGif'/><br></br>
+        <p className='loadingText'>Detecting Your Location...</p><br></br>
+        <p className='loadingText2'>If you're having trouble, check your device's location settings or refresh the page.</p>
+      </div>)}
       {isDesktop && (<div className='desktop'>
         <img className='main-logo' src="./Assets/Logos/logo-Main.png"/>
         <div className='innerDesktop'>
